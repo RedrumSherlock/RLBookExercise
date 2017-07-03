@@ -1,0 +1,107 @@
+
+\documentclass[10pt,letterpaper]{article}
+
+
+
+% Some useful packages
+% math
+\usepackage{amsmath}
+% pretty colors
+\usepackage{color}
+% nicer urls that break at the end of the page
+\usepackage{url}
+% every document needs images
+\usepackage{graphicx}
+\usepackage{setspace}
+
+\graphicspath{{./figures/}}   % where to look for images
+
+%let's fiddle with the default margins to save some trees
+%this makes the odd side margin go to the default of 1inch
+\oddsidemargin 0.0in
+%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper
+\textwidth 6.5in
+% less white space, please!
+\headheight 0.0in
+% shift everything up
+\topmargin -0.5in
+\footskip .6in
+% text should take up all but a 1'' margin
+\textheight 9.0in
+\doublespacing
+
+
+% Define some shortcuts for things I want to use.
+% Use them like, for example:
+% \begin{hypothesis}Lettuce causes brain damage.\end{hypothesis}
+% Numbering & formatting will happen automatically.
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{task}{Task}
+\newtheorem{contribution}{Contribution}
+
+
+% Shortcuts: allows you to use limited markup when editing/collaborating.
+% \comment{This section needs to be rewritten.}
+\def\ask#1{\textcolor{red}{\bf $\langle\langle$Question:\ #1$\rangle\rangle$}}
+\def\comment#1{\textcolor{red}{\bf $\langle\langle$Comment:\ #1$\rangle\rangle$}}
+
+
+% This imitates the Wikipedia ``Citation Needed'' text; use it as a temporary
+% marker for things you need to cite.
+\def\citationneeded{$^{\textcolor{blue}{\text{[citation needed]}}}$ }
+
+% format et al.
+\def\etal{\textit{et al.}}
+\def\ie{\textit{i.e.}}
+\def\eg{\textit{e.g.}}
+
+\title{Attempts to exercise in Reinforcement Learning book Chapter 3}
+\author{Mengliao Wang}
+
+
+\begin{document}
+
+% Generate Title Page
+\maketitle
+
+
+% this dumps the abstract on a front page all by itself.
+
+\section*{Exercise 3.1: }
+\label{3.1}
+
+\begin{itemize}
+\item Example 1: Chess game. The goal is to beat the opponent in a classic chess game, and the \textit{agent} would be the player. The \textit{state} is the current board, and the \textit{action} is each play the player makes. There is only one reward at the end of the game, which is win, lose, or draw. The limitation is how to evaluate the current board to determine how are we doing. Another limitation is that we do not receive continuous reward, but only one reward at the end. Thus it is harder to evaluate the value of each state. Eventually We need to learn the policy to map each board status to a specific action, i.e. move that would maximize the final reward.
+\item Example 2: Investment in stock market. Here the \textit{agent} would be the investor, and the \textit{state} could be many different sources of information. The most important one of course is the current market price for each stock, but we can also utilize other information like the number of trades happened, calls made, exchange rates, etc. The \textit{action} is the buy/sell/hold on any specific stock. Lastly, \textit{reward} is the profit we gained/lost after the action, which we need to maximize on a long term. There are a few limitations: Firstly, the transactions happen on real-time, so the model is not discrete unless we split it into small intervals in sacrifice for real-time accuracy. Secondly, We have limited information of the states, because the stock prices do not truely represent the environment. Also the prices is the source of reward, which might introduce confusion and potentially data correlation. Lastly, the rewards are highly nonstationary without a straight forward pattern/model to follow, which might make the policy learning process extremely difficult.
+\item Example 3: Auto driving system. Here the \textit{agent} of course if the driver, and the \textit{state} would be many sensors on real word, like the speed, direction, height, other cars on the road, etc. The \textit{action} can be speed up/down, or turning the wheel, or turn on/off signals. The \textit{reward} is mostly about safety, which is whether we can reach the destination without any accident. But other factors can be taken into consideration as part of the reward as well, such as time taken to finish, comfort measured by numbers of sudden break, etc.
+\end{itemize}
+
+\section*{Exercise 3.2: }
+\label{3.2}
+
+No. There are cases that a goal-directed learning task cannot be represented by this framework, especially for the tasks that are sophisticated to evaluate the goal. For example, when we try to make a good painting, we can define the agent, action, environment clearly. We can also define the state to be the pixels on the painting. However there is not a good way to determine the reward. We cannot decide how good or bad a painting is in a measurable way. 
+
+\section*{Exercise 3.3: }
+\label{3.3}
+
+To separate the environment from the agent, the general rule we follow is that anything that cannot be changed arbitrarily by the agent is considered to be outside of it and thus part of its environment. Thus in this case anything outside of the car should be considered as environment, such as road, other vehicles, road block, etc. Anything that can be directly touched and manipulated inside the car should be considered as part of the agent, such as the break, steering wheel, accelerator, signals, etc. Lastly, regarding the parts on the car that are indirectly controlled by the driver, they should be classified as either agent or environment depending on the possibility that the this indirect control would not be functioning as expected. For example, if we do not take things that might make wheel losing control such as driving on the ice into consideration, then the wheels should be part of the agent as well, and vice versa.
+
+
+\section*{Exercise 3.4: }
+\label{3.4}
+
+If we treat this pole-balancing task also as episodic but with the same reward, then given $K$ is the number of time steps before failure the return would be $-\gamma^K$. The return looks the same as continuing formula, but after reaching failure the time step will be reset to 0, instead of continuing at $K$+1.
+
+
+\section*{Exercise 3.5: }
+\label{3.5}
+
+If we use formula 3.1 $G_t = R_{t+1} + R_{t+2} + ... R_{T} = 1$ as the way to calculate the return where $R_{T}=1, R_i=0, \forall i\neq T$, then we have not communicated to the program that we want to escape from the maze as soon as possible, because no matter what $T$ is the return is alway 1. Instead we should use discounted reward expectation as the return, i.e. $G_t = R_{t+1} + \gamma R_{t+2} + ... \gamma^{T-t-1}R_{T} = \gamma^{T-t-1}, 0<\gamma<1$. In this way, the sooner robot escapes the maze, the bigger return would be ($T$ will be less, so $\gamma^{T-t-1}$ will be bigger).
+
+\section*{Exercise 3.5: }
+\label{3.5}
+
+
+\clearpage
+
+\end{document}
