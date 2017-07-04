@@ -6,6 +6,7 @@
 % Some useful packages
 % math
 \usepackage{amsmath}
+\usepackage{amsfonts}
 % pretty colors
 \usepackage{color}
 % nicer urls that break at the end of the page
@@ -13,6 +14,9 @@
 % every document needs images
 \usepackage{graphicx}
 \usepackage{setspace}
+
+\newcommand{\e}[1]{\mathbb E}
+\newcommand\given[1][]{\:#1\vert\:}
 
 \graphicspath{{./figures/}}   % where to look for images
 
@@ -28,8 +32,6 @@
 \footskip .6in
 % text should take up all but a 1'' margin
 \textheight 9.0in
-\doublespacing
-
 
 % Define some shortcuts for things I want to use.
 % Use them like, for example:
@@ -96,12 +98,126 @@ If we treat this pole-balancing task also as episodic but with the same reward, 
 \section*{Exercise 3.5: }
 \label{3.5}
 
-If we use formula 3.1 $G_t = R_{t+1} + R_{t+2} + ... R_{T} = 1$ as the way to calculate the return where $R_{T}=1, R_i=0, \forall i\neq T$, then we have not communicated to the program that we want to escape from the maze as soon as possible, because no matter what $T$ is the return is alway 1. Instead we should use discounted reward expectation as the return, i.e. $G_t = R_{t+1} + \gamma R_{t+2} + ... \gamma^{T-t-1}R_{T} = \gamma^{T-t-1}, 0<\gamma<1$. In this way, the sooner robot escapes the maze, the bigger return would be ($T$ will be less, so $\gamma^{T-t-1}$ will be bigger).
+If we use formula 3.1 $G_t = R_{t+1} + R_{t+2} + ... R_{T} = 1$ as the way to calculate the return where $R_{T}=1, R_i=0, \forall i\neq T$, then we have not communicated to the program that we want to escape from the maze as soon as possible, because no matter what $T$ is the return is alway 1. Instead we can use discounted reward expectation as the return, i.e. $G_t = R_{t+1} + \gamma R_{t+2} + ... \gamma^{T-t-1}R_{T} = \gamma^{T-t-1}, 0<\gamma<1$. In this way, the sooner robot escapes the maze, the bigger return would be ($T$ will be less, so $\gamma^{T-t-1}$ will be bigger). Another alternative is to set the rewards to be 0 from escaping the maze, and a reward of -1 for all other states.
 
-\section*{Exercise 3.5: }
-\label{3.5}
+\section*{Exercise 3.6: Broken Vision System}
+\label{3.6}
+
+Yes after seeing the first scene we already have access to the Markov state of the environment. If the camera was broken and not receiving any image for a whole day, then we would not have access to the Markov state since the information is independent with the states in the history.
 
 
+\section*{Exercise 3.7: }
+\label{3.7}
+By definition of $q_\pi(s,a)$:
+\begin{align}
+q_\pi(s,a) &= \mathbb{E}_{\pi}[{\sum_{k=0}^\infty{\gamma^kR_{t+k+1}}\given S_t=s, A_t=a}]\\
+&= \mathbb{E}_{\pi}[R_{t+1} + \gamma\sum_{k=0}^\infty{\gamma^kR_{t+k+2}}\given S_t=s, A_t=a]\\
+&= r(s,a) + \gamma\sum_{s',r}p(s',r\given s,a)[\sum_{k=0}^\infty\gamma^kR_{t+k+2} \given S_{t+1}=s', A_t=a]\\
+&= r(s,a) + \gamma\sum_{s',r}p(s',r\given s,a)\sum_{a'}\pi(a'\given s')[\sum_{k=0}^\infty\gamma^kR_{t+k+2} \given S_{t+1}=s', A_{t+1}=a']\\
+&= r(s,a) + \gamma\sum_{s',r}p(s',r\given s,a)\sum_{a'}\pi(a'\given s')q_\pi(s',a')
+\end{align}
+
+
+\section*{Exercise 3.8: }
+\label{3.8}
+
+Suppose the index starts from left-top corner from 0 to 4, and we denote value of the $i$th row and $j$th row as $v_{i,j}$, then we have:
+\begin{align}
+v_{2,2} &= \sum_a\pi(a|s_{2,2})\sum_{s',r}p(s',r\given s,a){[r+ \gamma v_\pi(s')]}\\
+&= \dfrac{1}{4}[0+\gamma v_{1,2}] + \dfrac{1}{4}[0+\gamma v_{2,3}] + \dfrac{1}{4}[0+\gamma v_{3,2}] + \dfrac{1}{4}[0+\gamma v_{2,1}]\\
+&= 0.25\times0.9\times2.3 + 0.25\times0.9\times0.4 + 0.25\times0.9\times-0.4 + 0.25\times0.9\times0.7\\
+&= 0.7
+\end{align}
+
+
+\section*{Exercise 3.9: }
+\label{3.9}
+
+If we add a constanct $c$ to reward $R$, then the new return $G'_t$ would be:
+\begin{align}
+G'_t &= \sum_{k=0}^\infty\gamma^k(R_{t+k+1}+c)\\
+&= \sum_{k=0}^\infty\gamma^kR_{t+k+1} + \sum_{k=0}^\infty c\gamma^k\\
+&= G_t + \sum_{k=0}^\infty c\gamma^k\\
+&= G_t + \dfrac{c}{1-\gamma}
+\end{align}
+
+So the constant $v_c = \dfrac{c}{1-\gamma}$
+
+
+\section*{Exercise 3.10: }
+\label{3.10}
+
+It will change the task if we add a constanct $c$ to rewards in an episodic task. Here we have new return:
+\begin{align}
+G'_t &= \sum_{k=0}^{T-t-1}\gamma^k(R_{t+k+1}+c)\\
+&= \sum_{k=0}^{T-t-1}\gamma^kR_{t+k+1} + \sum_{k=0}^{T-t-1} c\gamma^k\\
+&= G_t + c\dfrac{1-\gamma^{T-t-1}}{1-\gamma}
+\end{align}
+
+Here $T$ is the termination time step. Thus we can see the reward for each time step has been modified differently, and we are introducing higher reward for earlier time steps than the original reward, which changes the task goal.
+
+
+\section*{Exercise 3.11: }
+\label{3.11}
+
+The two equations are: $v_\pi(s) = \mathbb{E}_\pi[q_\pi(s,a)\given S_t=s] = \sum_a \pi(a\given s)q_\pi(s,a)$.
+
+
+\section*{Exercise 3.12: }
+\label{3.12}
+
+Similarily, the two equations are $q_\pi(s,a) = \mathbb{E}[R_{t+1} + \gamma v_\pi(s') \given S_t=s, A_t=a, S_{t+1} = s'] = r(s,a,s') + \gamma\sum_{s',r}p(r,s'\given s,a)v_\pi(s')$
+
+
+\section*{Exercise 3.13: }
+\label{3.13}
+
+The optimal policy would be to use putter on the green, and use driver whenever outside of the green. So the optimal value function would have -1 on the whole green, and -2 and above outside of the green, depending on the shortest distance $|S|$ from the location to the green. Formally, given the max range of a hit with driver is $m$, then we have the optimal value function:
+\[v(s) = \begin{cases}
+-1,& \text{if } green\\
+-[ceil(\dfrac{|S|}{m}) + 1],              & \text{otherwise}
+\end{cases}
+\]
+
+
+\section*{Exercise 3.14: }
+\label{3.14}
+
+On the green $v_*(s, putter)$ will be always -1, since we can hit the target with one put.
+
+\section*{Exercise 3.15: }
+\label{3.15}
+
+According to the formula of optimal action function, we have:
+
+\begin{align}
+q_*(h,s) &= p(h\given h,s)[r_s + \gamma\max_{a'}q_*(h,a')] + p(l\given h,s)[r_s + \gamma\max_{a'}q_*(l,a')]\\
+&= \alpha[r_s+\gamma\max_{a'}q_*(h,a')] + (1-\alpha)[r_s + \gamma\max_{a'}q_*(l,a')]\\
+q_*(h,w) &= p(h\given h,w)[r_w + \gamma\max_{a'}q_*(h,a')] + p(l\given h,w)[r_w + \gamma\max_{a'}q_*(l,a')]\\
+&= r_w+\gamma\max_{a'}q_*(h,a')\\
+q_*(l,s) &= p(h\given l,s)[-3 + \gamma\max_{a'}q_*(h,a')] + p(l\given l,s)[r_s + \gamma\max_{a'}q_*(l,a')]\\
+&= (1-\beta)[-3+\gamma\max_{a'}q_*(h,a')] + \beta[r_s + \gamma\max_{a'}q_*(l,a')]\\
+q_*(l,w) &= p(h\given l,w)[r_w + \gamma\max_{a'}q_*(h,a')] + p(l\given l,w)[r_w + \gamma\max_{a'}q_*(l,a')]\\
+&= r_w + \gamma\max_{a'}q_*(l,a')\\
+q_*(l,r) &= p(h\given l,r)[0 + \gamma\max_{a'}q_*(h,a')] + p(l\given l,r)[0 + \gamma\max_{a'}q_*(l,a')]\\
+&= \gamma\max_{a'}q_*(h,a')\\
+\end{align}
+
+
+\section*{Exercise 3.16: }
+\label{3.16}
+
+If we mark the optimal value of the cell at $i$th row and $j$th column as $v_*(i,j), i,j=0,1,2,3,4$. Then according to formula 3.17 we have
+\begin{align}
+v_*(A) &= r(A',A) + \gamma v_*(A')\\
+&= r(A',A) + \gamma[0 + \gamma v_*(3,1)]\\
+&= r(A',A) + \gamma^2[0 + \gamma v_*(2,1)]\\
+&= r(A',A) + \gamma^3[0 + \gamma v_*(1,1)]\\
+&= r(A',A) + \gamma^5v_*(A)\\
+&= 10 + 0.9^5v_*(A)\\
+\end{align}
+
+From this equation we can easily have $v_*(A) = 24.419$.
 \clearpage
 
 \end{document}
