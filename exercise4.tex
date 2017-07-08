@@ -74,18 +74,24 @@
 
 According to $q_\pi(s,a) = r(s,a,s') + \gamma\sum_{s',r}p(r,s'\given s,a)v_\pi(s')$
 
-We have $q_\pi(11,down) = -1 + v(T) = -1$.
+We have $q_\pi(11, down) = -1 + v(T) = -1$.
 
-Similarly we have $q_\pi(7, down) = -1 + v(11) = -2$.
+Similarly we have $q_\pi(7, down) = -1 + v(11)$. Here $v(11)$ would take iterations to calculate, but given enough runs, it will converge to $-14$ as shown in Figure 4.1. Thus the optimal action value $q_\pi(7, down) = -15$.
+
+\section*{Exercise 4.2: }
+\label{4.2}
+
+If the dynamic of original states are unchanged, then $v_\pi(s), s=1,2,..,14$ will not be changed. So we have value function 
+
+\begin{align}
+v_\pi(15) &= 0.25\times[-1 + v_\pi(12)] + 0.25\times[-1 + v_\pi(13)]  + 0.25\times[-1 + v_\pi(12)] + 0.25\times[-1 + v_\pi(15)]\\
+&= 0.25\times(-23) + 0.25\times(-21)  + 0.25\times(-15) + 0.25\times[-1 + v_\pi(15)]
+\end{align}
+By solving the equation above we have $v_\pi(15) = $
 
 
-\section*{Exercise 3.2: }
-\label{3.2}
-
-No. There are cases that a goal-directed learning task cannot be represented by this framework, especially for the tasks that are sophisticated to evaluate the goal. For example, when we try to make a good painting, we can define the agent, action, environment clearly. We can also define the state to be the pixels on the painting. However there is not a good way to determine the reward. We cannot decide how good or bad a painting is in a measurable way. 
-
-\section*{Exercise 3.3: }
-\label{3.3}
+\section*{Exercise 4.3: }
+\label{4.3}
 
 To separate the environment from the agent, the general rule we follow is that anything that cannot be changed arbitrarily by the agent is considered to be outside of it and thus part of its environment. Thus in this case anything outside of the car should be considered as environment, such as road, other vehicles, road block, etc. Anything that can be directly touched and manipulated inside the car should be considered as part of the agent, such as the break, steering wheel, accelerator, signals, etc. Lastly, regarding the parts on the car that are indirectly controlled by the driver, they should be classified as either agent or environment depending on the possibility that the this indirect control would not be functioning as expected. For example, if we do not take things that might make wheel losing control such as driving on the ice into consideration, then the wheels should be part of the agent as well, and vice versa.
 
