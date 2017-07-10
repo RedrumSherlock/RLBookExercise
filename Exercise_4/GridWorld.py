@@ -2,7 +2,7 @@ import numpy as np
 
 V = np.zeros((5,4))
 temp = np.zeros((5,4))
-max_step = 1000
+max_step = 4
 
 def v_action(i, j, action):
     if (i == 0 and j == 0) or (i == 3 and j == 3):
@@ -13,7 +13,7 @@ def v_action(i, j, action):
         return V[3, 2]
     elif (i == 4 and j == 1 and action == 'up'):
         return V[3, 1]
-    elif (i == 0 and action == 'up') or (i == 3 and action == 'down') or \
+    elif (i == 0 and action == 'up') or (i == 3 and j != 1 and action == 'down') or \
     (j == 0 and action == 'left') or (j == 3 and action == 'right') or \
     (i == 4 and j == 1 and action == 'down'):
         return V[i,j]
