@@ -1,0 +1,123 @@
+
+\documentclass[10pt,letterpaper]{article}
+
+
+
+% Some useful packages
+% math
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{amssymb}
+% pretty colors
+\usepackage{color}
+% nicer urls that break at the end of the page
+\usepackage{url}
+% every document needs images
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+\newcommand{\e}{\mathbb E}
+\newcommand{\R}{\mathbb{R}}
+\newcommand\given[1][]{\:#1\vert\:}
+\DeclareMathOperator*{\argmin}{arg\,min} % thin space, limits underneath in displays
+\DeclareMathOperator*{\argmax}{arg\,max} % thin space, limits underneath in displays
+\newcommand{\var}[1]{{\operatorname{\mathit{#1}}}}
+\algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
+\algtext*{Indent}
+\algtext*{EndIndent}
+
+\graphicspath{{./figures/}}   % where to look for images
+
+%let's fiddle with the default margins to save some trees
+%this makes the odd side margin go to the default of 1inch
+\oddsidemargin 0.0in
+%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper
+\textwidth 6.5in
+% less white space, please!
+\headheight 0.0in
+% shift everything up
+\topmargin -0.5in
+\footskip .6in
+% text should take up all but a 1'' margin
+\textheight 9.0in
+
+% Define some shortcuts for things I want to use.
+% Use them like, for example:
+% \begin{hypothesis}Lettuce causes brain damage.\end{hypothesis}
+% Numbering & formatting will happen automatically.
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{task}{Task}
+\newtheorem{contribution}{Contribution}
+
+
+% Shortcuts: allows you to use limited markup when editing/collaborating.
+% \comment{This section needs to be rewritten.}
+\def\ask#1{\textcolor{red}{\bf $\langle\langle$Question:\ #1$\rangle\rangle$}}
+\def\comment#1{\textcolor{red}{\bf $\langle\langle$Comment:\ #1$\rangle\rangle$}}
+
+
+% This imitates the Wikipedia ``Citation Needed'' text; use it as a temporary
+% marker for things you need to cite.
+\def\citationneeded{$^{\textcolor{blue}{\text{[citation needed]}}}$ }
+
+% format et al.
+\def\etal{\textit{et al.}}
+\def\ie{\textit{i.e.}}
+\def\eg{\textit{e.g.}}
+
+\title{Attempts to exercise in Reinforcement Learning book Chapter 7}
+\author{Mengliao Wang}
+
+
+\begin{document}
+
+% Generate Title Page
+\maketitle
+
+
+% this dumps the abstract on a front page all by itself.
+
+\section*{Exercise 7.1: }
+\label{7.1}
+
+First of all, according to definition of $G_t$ and $G_{t:t+n}$ we have the following equations:
+
+\begin{align*}
+G_t &= R_{t+1} + \gamma R_{t+2} + ... + \gamma^{T-t-1}R_T\\
+G_{t+n} &= R_{t+n+1} + \gamma R_{t+n+2} + ... + \gamma^{T-t-n-1}R_T\\
+G_{t:t+n} &= R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1}R_{t+n} + \gamma^nV_{t+n-1}(S_{t+n})
+\end{align*}
+
+From these equation we can have 
+
+\begin{equation}
+G_t = G_{t:t+n} -\gamma^nV_{t+n-1}(S_{t+n}) + \gamma^nG_{t+n}
+\end{equation}
+
+Then by applying equation 1, the difference between $G_t$ and $V_{t+n-1}(S_t)$ can be written as:
+
+\begin{align}
+G_t - V_{t+n-1}(S_t) &= G_{t:t+n} -\gamma^nV_{t+n-1}(S_{t+n}) + \gamma^nG_{t+n} - V_{t+n-1}(S_t) \\
+&= [G_{t:t+n} - V_{t+n-1}(S_t)] + \gamma^n[G_{t+n} - V_{t+n-1}(S_{t+n})]\\
+&= \delta_t + \gamma^n[\delta_{t+n} + \gamma^n[G_{t+2n} - V_{t+2n-1}(S_{t+2n})]]\\
+&= \sum_{k=0}^{t+kn<T}\gamma^{kn}\delta_{t+kn}
+\end{align}
+
+
+\section*{Exercise 7.2: }
+\label{7.2}
+
+
+\section*{Exercise 7.3: }
+\label{7.3}
+
+A larger random walk task will make the simulated sequence significantlly longer, which allows us to run TD approach on a bigger $n$. If we change the number of states to be smaller, it will be beneficial for smaller $n$ values, since less simulated sequences will have more steps than $n$. However, I do not think changing the left-side outcome from 0 to -1 would make a differece in the best value of $n$ here.
+
+\clearpage
+
+\end{document}
