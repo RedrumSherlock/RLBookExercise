@@ -1,0 +1,260 @@
+
+\documentclass[10pt,letterpaper]{article}
+
+
+
+% Some useful packages
+% math
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{amssymb}
+% pretty colors
+\usepackage{color}
+% nicer urls that break at the end of the page
+\usepackage{url}
+% every document needs images
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+\newcommand{\e}{\mathbb E}
+\newcommand{\R}{\mathbb{R}}
+\newcommand\given[1][]{\:#1\vert\:}
+\DeclareMathOperator*{\argmin}{arg\,min} % thin space, limits underneath in displays
+\DeclareMathOperator*{\argmax}{arg\,max} % thin space, limits underneath in displays
+\newcommand{\var}[1]{{\operatorname{\mathit{#1}}}}
+\algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
+\algtext*{Indent}
+\algtext*{EndIndent}
+
+\graphicspath{{./figures/}}   % where to look for images
+
+%let's fiddle with the default margins to save some trees
+%this makes the odd side margin go to the default of 1inch
+\oddsidemargin 0.0in
+%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper
+\textwidth 6.5in
+% less white space, please!
+\headheight 0.0in
+% shift everything up
+\topmargin -0.5in
+\footskip .6in
+% text should take up all but a 1'' margin
+\textheight 9.0in
+
+% Define some shortcuts for things I want to use.
+% Use them like, for example:
+% \begin{hypothesis}Lettuce causes brain damage.\end{hypothesis}
+% Numbering & formatting will happen automatically.
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{task}{Task}
+\newtheorem{contribution}{Contribution}
+
+
+% Shortcuts: allows you to use limited markup when editing/collaborating.
+% \comment{This section needs to be rewritten.}
+\def\ask#1{\textcolor{red}{\bf $\langle\langle$Question:\ #1$\rangle\rangle$}}
+\def\comment#1{\textcolor{red}{\bf $\langle\langle$Comment:\ #1$\rangle\rangle$}}
+
+
+% This imitates the Wikipedia ``Citation Needed'' text; use it as a temporary
+% marker for things you need to cite.
+\def\citationneeded{$^{\textcolor{blue}{\text{[citation needed]}}}$ }
+
+% format et al.
+\def\etal{\textit{et al.}}
+\def\ie{\textit{i.e.}}
+\def\eg{\textit{e.g.}}
+
+\title{Attempts to exercise in Reinforcement Learning book Chapter 7}
+\author{Mengliao Wang}
+
+
+\begin{document}
+
+% Generate Title Page
+\maketitle
+
+
+% this dumps the abstract on a front page all by itself.
+
+\section*{Exercise 7.1: }
+\label{7.1}
+
+First of all, according to definition of $G_t$ and $G_{t:t+n}$ we have the following equations:
+
+\begin{align*}
+G_t &= R_{t+1} + \gamma R_{t+2} + ... + \gamma^{T-t-1}R_T\\
+G_{t+n} &= R_{t+n+1} + \gamma R_{t+n+2} + ... + \gamma^{T-t-n-1}R_T\\
+G_{t:t+n} &= R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1}R_{t+n} + \gamma^nV_{t+n-1}(S_{t+n})
+\end{align*}
+
+From these equation we can have 
+
+\begin{equation}
+G_t = G_{t:t+n} -\gamma^nV_{t+n-1}(S_{t+n}) + \gamma^nG_{t+n}
+\end{equation}
+
+Then by applying equation 1, the difference between $G_t$ and $V_{t+n-1}(S_t)$ can be written as:
+
+\begin{align}
+G_t - V_{t+n-1}(S_t) &= G_{t:t+n} -\gamma^nV_{t+n-1}(S_{t+n}) + \gamma^nG_{t+n} - V_{t+n-1}(S_t) \\
+&= [G_{t:t+n} - V_{t+n-1}(S_t)] + \gamma^n[G_{t+n} - V_{t+n-1}(S_{t+n})]\\
+&= \delta_t + \gamma^n[\delta_{t+n} + \gamma^n[G_{t+2n} - V_{t+2n-1}(S_{t+2n})]]\\
+&= \sum_{k=0}^{t+kn<T}\gamma^{kn}\delta_{t+kn}
+\end{align}
+
+
+\section*{Exercise 7.3: }
+\label{7.3}
+
+A larger random walk task will make the simulated sequence significantlly longer, which allows us to run TD approach on a bigger $n$. If we change the number of states to be smaller, it will be beneficial for smaller $n$ values, since less simulated sequences will have more steps than $n$. However, I do not think changing the left-side outcome from 0 to -1 would make a differece in the best value of $n$ here.
+
+
+\section*{Exercise 7.4: }
+\label{7.4}
+
+Here is the pseudocode for per-reward off-policy state value algorithm:
+
+
+\begin{algorithmic}
+\State Initialize:
+\Indent
+\State an arbitrary behaviour policy $b$ such that $ b(a|s)>0$
+\State $V(s)$ arbitrarily
+\State $\pi$ to be a fixed given policy
+\State step size $\alpha \in (0,1]$, small $\epsilon>0$, a positive integer $n$
+\EndIndent
+\State All store and access opeartions (for $S_t, A_t$ , and $R_t$) can take their index mode $n$
+\Repeat (For each episode):
+\State Initialize and store $S_0 \neq$ terminal
+\State Select and store an action $A_0 \sim b(\cdot|S_0)$
+\State $T \gets \infty$
+\For {$t=0, 1, 2, ...$}
+\If {$t<T$}
+\State Take action $A_t$
+\State Observe and store the next reward as $R_{t+1}$ and the next state as $S_{t+1}$
+\If {$S_{t+1}$ is terminal}
+\State $T \gets t + 1$
+\Else
+\State Select and store an action $A_{t+1} \sim b(\cdot|S_{t+1})$
+\EndIf
+\EndIf
+\State $\tau \gets t-n+1$
+\If {$\tau \ge 0$}
+\State $G \gets 0$
+\State $\rho \gets 1$
+\For {$k=\tau+1, \tau+2,..., \min(\tau+n, T)$}
+\State $\phi \gets \rho \cdot [1-\dfrac{\pi(A_k|S_k)}{b(A_k|S_k)}]$
+\State $\rho \gets \rho \cdot \dfrac{\pi(A_k|S_k)}{b(A_k|S_k)}$
+\State $G \gets G + \gamma^{k-\tau-1}\rho R_k + \gamma^{k-\tau-1}\phi V(S_k)$
+\EndFor
+\If {$\tau+n<T$}
+\State $G \gets G + \gamma^nV(S_{\tau+n})$
+\EndIf
+\State $V(S_\tau) \gets V(S_\tau) + \alpha[G -V(S_\tau)]$
+\EndIf
+\If {$\tau = T-1$}
+\State Break For Loop
+\EndIf
+\EndFor
+\Until{$True$}
+\end{algorithmic}
+
+
+
+\section*{Exercise 7.5: }
+\label{7.5}
+
+Similiar to above, here is the pseudocode for per-reward off-policy action value algorithm:
+
+
+\begin{algorithmic}
+\State Initialize:
+\Indent
+\State an arbitrary behaviour policy $b$ such that $ b(a|s)>0$
+\State $Q(s,a)$ arbitrarily
+\State $\pi$ to be a fixed given policy, or $\epsilon$-greedy with respect to $Q(s,a)$
+\State step size $\alpha \in (0,1]$, small $\epsilon>0$, a positive integer $n$
+\EndIndent
+\State All store and access opeartions (for $S_t, A_t$ , and $R_t$) can take their index mode $n$
+\Repeat (For each episode):
+\State Initialize and store $S_0 \neq$ terminal
+\State Select and store an action $A_0 \sim b(\cdot|S_0)$
+\State Store $Q(S_0, A_0)$ as $Q_0$
+\State $T \gets \infty$
+\For {$t=0, 1, 2, ...$}
+\If {$t<T$}
+\State Take action $A_t$
+\State Observe and store the next reward as $R_{t+1}$ and the next state as $S_{t+1}$
+\State Store $\sum_a\pi(a|S_t)Q(S_t,a)$ as $\bar{Q}_{t+1}$
+\If {$S_{t+1}$ is terminal}
+\State $T \gets t + 1$
+\Else
+\State Select and store an action $A_{t+1} \sim b(\cdot|S_{t+1})$
+\EndIf
+\EndIf
+\State $\tau \gets t-n+1$
+\If {$\tau \ge 0$}
+\State $G \gets 0$
+\State $\rho \gets 1$
+\For {$k=\tau+1, \tau+2,..., \min(\tau+n-1, T)$}
+\State $\phi \gets \rho \cdot [1-\dfrac{\pi(A_{k-1}|S_{k-1})}{b(A_{k-1}|S_{k-1})}]$
+\State $G \gets G + \gamma^{k-\tau-1}\rho R_k + \gamma^{k-\tau}\phi \bar{Q}_{k}$
+\State $\rho \gets \rho \cdot \dfrac{\pi(A_k|S_k)}{b(A_k|S_k)}$
+\EndFor
+\If {$\tau+n<T$}
+\State $G \gets G + \gamma^nQ(S_{\tau+n}, A_{\tau+n})$
+\EndIf
+\State $Q(S_\tau, A_\tau) \gets Q(S_\tau, A_\tau) + \alpha[G -Q(S_\tau, A_\tau)]$
+\EndIf
+\If {$\tau = T-1$}
+\State Break For Loop
+\EndIf
+\EndFor
+\Until{$True$}
+\end{algorithmic}
+
+
+\section*{Exercise 7.6: }
+\label{7.6}
+
+According to definition 7.10, we can have the following:
+
+\begin{align*}
+G_t - V(S_t) &= \rho_t(R_{t+1} + \gamma G_{t+1}) + (1-\rho_t)V(S_t) - V(S_t)\\
+&= \rho_t[R_{t+1} + \gamma G_{t+1} - V(S_t)]\\
+&= \rho_t[R_{t+1} + \gamma V(S_{t+1}) - V(S_t)] +\gamma\rho_t[G_{t+1} - V(S_{t+1})]\\
+&= \rho_t\delta_t + \gamma\rho_t\rho_{t+1}\delta_{t+1} + \gamma^2\rho_t\rho_{t+1}[G_{t+2} - V(S_{t+2})]\\
+&= \rho_{t:t}\delta_t + \gamma\rho_{t:t+1}\delta_{t+1} + \gamma^2\rho_{t:t+2}\delta_{t+2} + ... + \gamma^{T-t-1}\rho_{t:T-1}\delta_{T-1} + \gamma^{T-t}\rho_{t:T}[G_{T}- V(S_{T})]\\
+&= \sum_{k=t}^{T-1}\gamma^{k-t}\rho_{t:k}\delta_k
+\end{align*}
+
+Here we define $\rho_{t:k} = \prod_{l=t}^{k}\rho_l$
+
+\section*{Exercise 7.7: }
+\label{7.7}
+
+Suppose the definition 7.11 in the book is written as $G_{t:h} = R_{t+1} + \gamma(\rho_{t+1}G_{t+1:h} + (1-\rho_{t+1})\bar{Q}_{t+1})$, then we can have:
+
+\begin{align*}
+G_t - Q_t &= R_{t+1} + \gamma[\rho_{t+1}G_{t+1} + (1-\rho_{t+1})\bar{Q}_{t+1}] - Q_t\\
+&= (1 - \rho_{t+1})(R_{t+1} + \gamma\bar{Q}_{t+1} - Q_t) + \rho_{t+1}R_{t+1} -\rho_{t+1}Q_t + \gamma\rho_{t+1}G_{t+1}\\
+&= (1 - \rho_{t+1})\delta'_t + \rho_{t+1}(R_{t+1} + \gamma Q_{t+1} - Q_t) + \gamma\rho_{t+1}G_{t+1} - \gamma\rho_{t+1}Q_{t+1}\\
+&= (1 - \rho_{t+1})\delta'_t + \rho_{t+1}\delta_t + \gamma\rho_{t+1}(G_{t+1} - Q_{t+1})\\
+&= (1 - \rho_{t+1})\delta'_t + \rho_{t+1}\delta_t + \gamma\rho_{t+1}(1 - \rho_{t+2})\delta'_{t+1} + \gamma\rho_{t+1}\rho_{t+2}\delta_{t+1} +\gamma^2\rho_t\rho_{t+1}(G_{t+2} - Q_{t+2})\\
+&= (1 - \rho_{t+1})\delta'_t + \rho_{t+1}\delta_t + \gamma\rho_{t+1}(1 - \rho_{t+2})\delta'_{t+1} + \gamma\rho_{t+1}\rho_{t+2}\delta_{t+1} + ... \\
+& \ \ \  + \gamma^{T-t-1}\rho_{t+1:T-1}(1 - \rho_{T})\delta'_{T-1} + \gamma^{T-t-1}\rho_{t+1:T}\delta_{T-1} + \gamma^{T-t}\rho_{t+1:T}(G_T - Q_T)\\
+&= \sum_{k=t}^{T-1}\gamma^{k-t}\rho_{t+1:k}(1-\rho_{k+1})\delta'_k + \sum_{k=t}^{T-1}\gamma^{k-t}\rho_{t+1:k+1}\delta_k
+\end{align*}
+
+Here for convenience we write $Q(S_t, A_t)$ as $Q_t$. Similar to above we define $\rho_{t:k} = \prod_{l=t}^{k}\rho_l$, where $\rho_{t:t-1} = 1$. Also we have $\delta'_t = R_{t+1} + \gamma\sum_a\pi(a|S_{t+1})Q(S_{t+1},a)-Q(S_t,A_t)$, and $\delta_t = R_{t+1} + \gamma Q(S_{t+1},A_{t+1})-Q(S_t,A_t)$
+
+
+\clearpage
+
+\end{document}
